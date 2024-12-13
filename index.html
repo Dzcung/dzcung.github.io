@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Average Annual Medical Costs by Attribute</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .bar {
+            fill: rgb(87, 140, 216);
+        }
+        .label {
+            font-size: 16px;
+        }
+        #detailedOptions {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <a href="documentation.html">Project Documentation</a>
+    <h1>Average Annual Medical Costs by Attribute</h1>
+    <form>
+        <input type="radio" name="view" value="general" id="general" checked />
+        <label for="general">General View</label>
+        <input type="radio" name="view" value="detailed" id="detailed" />
+        <label for="detailed">Detailed View</label>
+        <div id="detailedOptions">
+            <strong>View Costs By:</strong>
+            <input type="radio" name="variable" value="age" id="age" checked />
+            <label for="age">Age</label>
+            <input type="radio" name="variable" value="sex" id="sex" />
+            <label for="sex">Sex</label>
+            <input type="radio" name="variable" value="bmi" id="bmi" />
+            <label for="bmi">Body Mass Index (BMI)</label>
+            <input type="radio" name="variable" value="children" id="children" />
+            <label for="children">Number of Children</label>
+            <input type="radio" name="variable" value="smoker" id="smoker" />
+            <label for="smoker">Smoking Status</label>
+            <input type="radio" name="variable" value="region" id="region" />
+            <label for="region">Region</label>
+        </div>
+    </form>
+    <div id="chart"></div>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script type="module">
+        // set the chart size
+        const marginTop = 40;
+        const marginBottom = 100;
+        const marginRight = 30;
+        const marginLeft = 115;
+        const width = 1200 - marginLeft - marginRight;
+        const height = 700 - marginTop - marginBottom;
+
+        // load the data and clean it up
+        const loadData = () => d3.csv("insurance_cleaned.csv").then(data => data.map(row => {
+            // make sure number values are not loaded as text
+            row.charges = Number(row.charges);
+            row.age = Number(row.age);
+            row.children = Number(row.children);
+            row.bmi = Number(row.bmi);
+            return row;
+        }));
+
+        const data = await loadData();
+
+        // caclulcate the average charges for a set of data
+        const getAvgCharges = (data) => data.reduce((sum, row) => sum + row.charges, 0) / data.length;
+
+        // calculate all averages for every attribute
+
+        // get the average charges for each age group
+        const adults = data.filter(row => row.age >= 18 && row.age < 40);
+        const middleAge = data.filter(row => row.age >= 40 && row.age < 60);
+        const seniors = data.filter(row => row.age >= 60);
+        
+        const adultsAvg = getAvgCharges(adults);
+        const middleAgeAvg = getAvgCharges(middleAge);
+        const seniorAvg = getAvgCharges(seniors);
+        const ageAvg = (adultsAvg + middleAgeAvg + seniorAvg) / 3;
+
+        // get the average charges for each sex
+        const males = data.filter(row => row.sex == 'male');
+        const females = data.filter(row => row.sex == 'female');
+
+        const maleAvg = getAvgCharges(males);
+        const femaleAvg = getAvgCharges(females);
+        const sexAvg = (maleAvg + femaleAvg) / 2;
+
+        // get the average charges for each bmi group
+        const underweight = data.filter(row => row.bmi < 18.5);
+        const healthyWeight = data.filter(row => row.bmi >= 18.5 && row.bmi <= 24.9);
+        const overweight = data.filter(row => row.bmi >= 25 && row.bmi <= 29.9);
+        const obese = data.filter(row => row.bmi >= 30);
+        
+        const underweightAvg = getAvgCharges(underweight);
+        const healthyWeightAvg = getAvgCharges(healthyWeight);
+        const overweightAvg = getAvgCharges(overweight);
+        const obeseAvg = getAvgCharges(obese);
+        const bmiAvg = (underweightAvg + healthyWeightAvg + overweightAvg + obeseAvg) / 4;
+
+        // get the average charges based on number of children
+        const noChildren = data.filter(row => row.children == 0);
+        const oneChild = data.filter(row => row.children == 1);
+        const twoChildren = data.filter(row => row.children == 2);
+        const threeChildren = data.filter(row => row.children == 3);
+        const fourChildren = data.filter(row => row.children == 4);
+        const fiveChildren = data.filter(row => row.children == 5);
+        
+        const noChildrenAvg = getAvgCharges(noChildren);
+        const oneChildAvg = getAvgCharges(oneChild);
+        const twoChildrenAvg = getAvgCharges(twoChildren);
+        const threeChildrenAvg = getAvgCharges(threeChildren);
+        const fourChildrenAvg = getAvgCharges(fourChildren);
+        const fiveChildrenAvg = getAvgCharges(fiveChildren);
+        const childrenAvg = (noChildrenAvg + oneChildAvg + twoChildrenAvg + threeChildrenAvg + fourChildrenAvg + fiveChildrenAvg) / 6;
+
+        // get the average charges for smokers and non smokers
+        const smokers = data.filter(row => row.smoker == 'yes');
+        const nonSmokers = data.filter(row => row.smoker == 'no');
+
+        const smokersAvg = getAvgCharges(smokers);
+        const nonSmokersAvg = getAvgCharges(nonSmokers);
+        const smokerAvg = (smokersAvg + nonSmokersAvg) / 2;
+
+        // get the average charges for each region
+        const northeast = data.filter(row => row.region == 'northeast');
+        const northwest = data.filter(row => row.region == 'northwest');
+        const southeast = data.filter(row => row.region == 'southeast');
+        const southwest = data.filter(row => row.region == 'southwest');
+        
+        const northeastAvg = getAvgCharges(northeast);
+        const northwestAvg = getAvgCharges(northwest);
+        const southeastAvg = getAvgCharges(southeast);
+        const southwestAvg = getAvgCharges(southwest);
+        const regionAvg = (northeastAvg + northwestAvg + southeastAvg + southwestAvg) / 4;
+
+        // display a bar chart for the data
+        const showChart = (data, label) => {
+            // clear out the previous chart
+            document.getElementById("chart").innerHTML = "";
+
+            // add chart to the page
+            const svg = d3
+                .select("#chart")
+                .append("svg")
+                .attr("width", width + marginLeft + marginRight)
+                .attr("height", height + marginTop + marginBottom)
+                .append("g")
+                .attr("transform", `translate(${marginLeft},${marginTop})`);
+
+            // add the x-axis label
+            svg
+                .append("text")
+                .attr("text-anchor", "middle")
+                .attr("x", width / 2)
+                .attr("y", height + marginBottom - 50)
+                .attr("font-weight", "bold")
+                .text(label);
+
+            // add the x-axis
+            const x = d3
+                .scaleBand()
+                .domain(data.map((d) => d.label))
+                .range([0, width])
+                .padding(0.2);
+            svg
+                .append("g")
+                .attr("transform", `translate(0,${height})`)
+                .attr("class", "label")
+                .call(d3.axisBottom(x))
+                .selectAll("text")
+                .style("text-anchor", "center");
+
+            // add the y-axis label
+            svg
+                .append("text")
+                .attr("text-anchor", "middle")
+                .attr("transform", "rotate(-90)")
+                .attr("x", 0 - height / 2)
+                .attr("y", 0 - marginLeft + 15)
+                .attr("font-weight", "bold")
+                .text("Costs");
+
+            // add the y-axis
+            const y = d3
+                .scaleLinear()
+                .domain([0, d3.max(data, (d) => d.charges)])
+                .range([height, 0]);
+            svg
+                .append("g")
+                .attr("class", "label")
+                .call(d3.axisLeft(y).tickFormat(d => d.toLocaleString('en-US', { style: 'currency', currency: 'USD' })));
+
+            // add the bars to the chart
+            svg
+                .selectAll(".bar")
+                .data(data)
+                .enter()
+                .append("rect")
+                .attr("class", "bar")
+                .attr("x", (d) => x(d.label))
+                .attr("width", x.bandwidth())
+                .attr("y", height)
+                .attr("height", 0)
+                .transition()
+                .duration(1000)
+                .attr("y", (d) => y(d.charges))
+                .attr("height", (d) => height - y(d.charges))
+                .delay(5);
+            
+            // display the average charges for each bar
+            svg
+                .selectAll(".value")
+                .data(data)
+                .enter()
+                .append("text")
+                .attr("class", "value")
+                .attr("x", (d) => x(d.label) + x.bandwidth() / 2)
+                .attr("y", (d) => y(d.charges) - 5)
+                .attr("text-anchor", "middle")
+                .attr("opacity", 0)
+                .text((d) => `${d.charges.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`)
+                .transition()
+                .duration(1000)
+                .delay(800)
+                .attr("opacity", 1);
+        };
+
+        const showAge = () => {
+            const chartData = [
+                { charges: adultsAvg, label: 'Adult (18 - 39)' },
+                { charges: middleAgeAvg, label: 'Middle Age (40 - 59)' },
+                { charges: seniorAvg, label: 'Senior (60+)' }
+            ];
+            showChart(chartData, "Age");
+        };
+
+        const showSex = () => {
+            const chartData = [
+                { charges: maleAvg, label: 'Male' },
+                { charges: femaleAvg, label: 'Female' }
+            ];
+            showChart(chartData, "Sex");
+        };
+
+        const showBmi = () => {
+            const chartData = [
+                { charges: underweightAvg, label: 'Underweight (< 18.5)' },
+                { charges: healthyWeightAvg, label: 'Healthy Weight (18.5 - 24.9)' },
+                { charges: overweightAvg, label: 'Overweight (25 - 29.9)' },
+                { charges: obeseAvg, label: 'Obese (30+)' }
+            ];
+            showChart(chartData, "Body Mass Index (BMI)");
+        };
+
+        const showChildren = () => {
+            const chartData = [
+                { charges: noChildrenAvg, label: 'No Children' },
+                { charges: oneChildAvg, label: 'One Child' },
+                { charges: twoChildrenAvg, label: 'Two Children' },
+                { charges: threeChildrenAvg, label: 'Three Children' },
+                { charges: fourChildrenAvg, label: 'Four Children' },
+                { charges: fiveChildrenAvg, label: 'Five Children' }
+            ];
+            showChart(chartData, "Number of Children");
+        };
+
+        const showSmoker = () => {
+            const chartData = [
+                { charges: smokersAvg, label: 'Smokers' },
+                { charges: nonSmokersAvg, label: 'Non Smokers' }
+            ];
+            showChart(chartData, "Smoking Status");
+        };
+
+        const showRegion = () => {
+            const chartData = [
+                { charges: northeastAvg, label: 'Northeast' },
+                { charges: northwestAvg, label: 'Northwest' },
+                { charges: southeastAvg, label: 'Southeast' },
+                { charges: southwestAvg, label: 'Southwest' }
+            ];
+            showChart(chartData, "Region");
+        };
+
+        const showGeneral = () => {
+            const chartData = [
+                { charges: ageAvg, label: 'Age' },
+                { charges: sexAvg, label: 'Sex' },
+                { charges: bmiAvg, label: 'Body Mass Index (BMI)' },
+                { charges: childrenAvg, label: 'Number of Children' },
+                { charges: smokerAvg, label: 'Smoking Status' },
+                { charges: regionAvg, label: 'Region' }
+            ];
+            showChart(chartData, "Attributes");
+        };
+
+        const showDetailed = () => {
+            const selected = document.querySelector('input[name="variable"]:checked').value;
+            switch (selected) {
+                case 'age':
+                    showAge();
+                    break;
+                case 'sex':
+                    showSex();
+                    break;
+                case 'bmi':
+                    showBmi();
+                    break;
+                case 'children':
+                    showChildren();
+                    break;
+                case 'smoker':
+                    showSmoker();
+                    break;
+                case 'region':
+                    showRegion();
+                    break;
+            }
+        };
+
+        // add change events
+
+        // view type change events
+        document.getElementById("general").addEventListener('change', () => {
+            document.getElementById("detailedOptions").style.display = "none";
+            showGeneral();
+        });
+        document.getElementById("detailed").addEventListener('change', () => {
+            document.getElementById("detailedOptions").style.display = "block";
+            showDetailed();
+        });
+
+        // general view change events
+        document.getElementById("age").addEventListener('change', showAge);
+        document.getElementById("sex").addEventListener('change', showSex);
+        document.getElementById("bmi").addEventListener('change', showBmi);
+        document.getElementById("children").addEventListener('change', showChildren);
+        document.getElementById("smoker").addEventListener('change', showSmoker);
+        document.getElementById("region").addEventListener('change', showRegion);
+
+        // show general by default
+        showGeneral();
+    </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Average Annual Medical Costs by Attribute</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #documentation {
+            text-align: left;
+            width: 700px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html">Visualization</a>
+    <h1>Project Documentation</h1>
+    <iframe width="1038" height="584" src="https://www.youtube.com/embed/UcVPehL7i1Y" title="Average Annual Medical Costs by Attribute" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <div id="documentation">
+        <p>For my project, there were two questions that I initially wanted to answer based on the dataset:</p>
+        <ol>
+            <li>Which attribute contributes the most to the cost of medical care?</li>
+            <li>What is the average cost difference between each group for each attribute (for example male vs female)?</li>
+        </ol>
+        <p>Based on these questions, I knew I would need a "general" graph that compares the cost across all attributes, and additionally more "detailed" views that compare the cost for different groups within each attribute. When determining how to compare differences between how groups in each attribute (age, sex, BMI, etc.) affect average cost, I attempted to build an interface that allowed each factor to be adjusted using dropdowns.</p>
+        <p>However, this complicated the visualization and led to issues with presentation, since some factor combinations (for example Adults (18 - 39) and Five Children) did not have data represented in the dataset. I ultimately decided to display the "general" view which compares the average costs across attributes, with further details available in the "detailed" view which breaks cost down by each group.</p>
+        <p>When building the visualization, I chose to use bar charts to show how each attribute affects cost. In the "general" view, each bar has a label for the attribute it represents (age, sex, BMI, etc.), and in the "detailed" view, each bar label represents a group inside an attribute ("Male" or "Female", "Adult", "Middle Age", etc.).</p>
+        <p>In all charts, the average cost for each bar is located at the top of the bar. The y-axis shows different cost values, and the x-axis shows the attributes / groups.</p>
+        <p>The view mode can be changed by using the "General View" or "Detailed View" radio fields. In the "detailed" view, there are additional radio fields for each attribute; this allows for deeper analysis when determing how attributes and their groups affect medical costs.</p>
+        <p>Using this visualization, I was able to determine that smoking status has the highest affect on medical costs. Interestingly, I also found that smoking status had the biggest gap between groups (Smokers vs Non Smokers) compared to all other attributes.</p>
+        <p>Additionally, using the "detailed" view, I was able to analyse the difference in cost between groups for each attribute; for example, costs between males and females are not that different. One thing I found interesting was that costs for those with five children are significantly lower than those with four or less children, which has some interesting implications.</p>
+    </div>
+</body>
+</html>
